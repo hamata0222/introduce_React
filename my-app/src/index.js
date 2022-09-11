@@ -2,17 +2,27 @@ import React from 'react';
 import ReactDOM from 'react-dom/client';
 import './index.css';
 
-class Square extends React.Component {
-    render() {
-        return (
-            <button
-                className="square"
-                onClick={() => this.props.onClick()}
-            >
-              {this.props.value}
-            </button>
-        );
-    }
+// React.Componentの子クラスとして定義する場合の書き方
+// class Square extends React.Component {
+//     render() {
+//         return (
+//             <button
+//                 className="square"
+//                 onClick={() => this.props.onClick()}
+//             >
+//               {this.props.value}
+//             </button>
+//         );
+//     }
+// }
+// 関数コンポーネントとして定義する書き方
+// 自身でStateを管理しないので、クラスにしなくても良い。
+function Square(props) {
+    return (
+        <button className="square" onClick={props.onClick}>
+            {props.value}
+        </button>
+    );
 }
 
 class Board extends React.Component {
@@ -24,6 +34,7 @@ class Board extends React.Component {
     }
 
     handleClick(i) {
+        // immutableな構成にしておく。後で履歴の実装とかがしやすい。
         const squares = this.state.squares.slice();
         squares[i] = 'X';
         this.setState({squares: squares});
