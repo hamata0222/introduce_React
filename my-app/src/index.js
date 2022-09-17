@@ -64,6 +64,7 @@ class Game extends React.Component {
         this.state = {
             history: [{
                 squares: Array(9).fill(null),
+                hand: [null, null],
             }],
             stepNumber: 0,
             xIsNext: true,
@@ -91,6 +92,7 @@ class Game extends React.Component {
             // push()だと元の配列を変更してしまうため、concat()を使う。
             history: history.concat([{
                 squares: squares,
+                hand: [(i % 3) + 1, Math.trunc(i / 3) + 1], // [col, row]
             }]),
             stepNumber: history.length,
             xIsNext: !this.state.xIsNext,
@@ -110,7 +112,7 @@ class Game extends React.Component {
 
         const moves = history.map((step, move) => {
             const desc = move ?
-                'Go to move #' + move :
+                'Go to move #' + move + ` (${step.hand[0]}, ${step.hand[1]})`:
                 'Go to game start';
             return (
                 <li key={move}>
