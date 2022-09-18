@@ -48,3 +48,11 @@ ol, ul {
 .game-info {
     margin-left: 20px;
 }
+
+.history-hand {
+    font-weight: normal;
+}
+
+.selected-hand {
+    font-weight: bold;
+}
