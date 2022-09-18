@@ -18,8 +18,9 @@ import './index.css';
 // 関数コンポーネントとして定義する書き方
 // 自身でStateを管理しないので、クラスにしなくても良い。
 function Square(props) {
+    const highlight = props.highlight ? 'highlight' : '';
     return (
-        <button className="square" onClick={props.onClick}>
+        <button className={"square " + highlight} onClick={props.onClick}>
             {props.value}
         </button>
     );
@@ -27,9 +28,11 @@ function Square(props) {
 
 class Board extends React.Component {
     renderSquare(i) {
+        const highlight = this.props.victoryLine && this.props.victoryLine.includes(i);
         return (
             <Square
                 value={this.props.squares[i]}
+                highlight={highlight}
                 onClick={() => this.props.onClick(i)}
             />
         );
@@ -144,12 +147,15 @@ class Game extends React.Component {
     render() {
         const history = this.state.history;
         const current = history[this.state.stepNumber];
-        const winner = calculateWinner(current.squares);
+        const result = calculateWinner(current.squares);
         let status;
-        if (winner) {
-            status = 'Winner: ' + winner;
+        let victoryLine;
+        if (result) {
+            status = 'Winner: ' + result.winner;
+            victoryLine = result.line.slice();
         } else {
             status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
+            victoryLine = null;
         }
 
         return (
@@ -158,6 +164,7 @@ class Game extends React.Component {
                     <Board
                         squares={current.squares}
                         boardSize={this.boardSize}
+                        victoryLine={victoryLine}
                         onClick={(i) => this.handleClick(i)}
                     />
                 </div>
@@ -188,7 +195,10 @@ function calculateWinner(squares) {
     for (let i = 0; i < lines.length; i++) {
         const [a, b, c] = lines[i];
         if (squares[a] && (squares[a] === squares[b]) && (squares[a] === squares[c])) {
-            return squares[a];
+            return {
+                winner: squares[a],
+                line: lines[i],
+            };
         }
     }
     return null; // 勝者なし
