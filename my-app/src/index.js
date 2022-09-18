@@ -50,6 +50,52 @@ class Board extends React.Component {
     }
 }
 
+class History extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            isDesc: false,
+        };
+    }
+
+    toggleSortOrder() {
+        this.setState({
+            isDesc: !this.state.isDesc,
+        });
+    }
+    
+    render() {
+        const asc_moves = this.props.history.map((step, move) => {
+            const handClass = move === this.props.stepNumber ?
+                'selected-hand' :
+                'history-hand';
+            const desc = move ?
+                'Go to move #' + move + ` (${step.hand[0]}, ${step.hand[1]})` :
+                'Go to game start';
+            return (
+                <li key={move}>
+                    <button
+                        onClick={() => this.props.onClick(move)}
+                        className={handClass}
+                    >
+                        {desc}
+                    </button>
+                </li>
+            );
+        });
+        
+        const isDesc = this.state.isDesc;
+        const moves = isDesc ? asc_moves.slice().reverse() : asc_moves;
+        const buttonLabel = 'Click to ' + (isDesc ? 'Asc' : 'Desc');
+        return (
+            <div>
+                <button onClick={() => this.toggleSortOrder()}>{buttonLabel}</button>
+                <ol>{moves}</ol>
+            </div>
+        );
+    }
+}
+
 class Game extends React.Component {
     constructor(props) {
         super(props);
@@ -106,25 +152,6 @@ class Game extends React.Component {
             status = 'Next player: ' + (this.state.xIsNext ? 'X' : 'O');
         }
 
-        const moves = history.map((step, move) => {
-            const handClass = move === this.state.stepNumber ?
-                'selected-hand' :
-                'history-hand';
-            const desc = move ?
-                'Go to move #' + move + ` (${step.hand[0]}, ${step.hand[1]})` :
-                'Go to game start';
-            return (
-                <li key={move}>
-                    <button
-                        onClick={() => this.jumpTo(move)}
-                        className={handClass}
-                    >
-                        {desc}
-                    </button>
-                </li>
-            );
-        });
-
         return (
             <div className="game">
                 <div className="game-board">
@@ -136,7 +163,11 @@ class Game extends React.Component {
                 </div>
                 <div className="game-info">
                     <div>{status}</div>
-                    <ol>{moves}</ol>
+                    <History
+                        history={history}
+                        stepNumber={this.state.stepNumber}
+                        onClick={(i) => this.jumpTo(i)}
+                    />
                 </div>
             </div>
         );
