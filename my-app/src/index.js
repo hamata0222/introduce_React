@@ -36,31 +36,24 @@ class Board extends React.Component {
     }
 
     render() {
-        return (
-            <div>
-                <div className="board-row">
-                    {this.renderSquare(0)}
-                    {this.renderSquare(1)}
-                    {this.renderSquare(2)}
-                </div>
-                <div className="board-row">
-                    {this.renderSquare(3)}
-                    {this.renderSquare(4)}
-                    {this.renderSquare(5)}
-                </div>
-                <div className="board-row">
-                    {this.renderSquare(6)}
-                    {this.renderSquare(7)}
-                    {this.renderSquare(8)}
-                </div>
-            </div>
-        );
+        const rows = [];
+        const size = this.props.boardSize;
+        for (let i = 0; i < size; i++) {
+            const rowSquares = [];
+            for (let j = 0; j < size; j++) {
+                rowSquares.push(this.renderSquare((i * size) + j));
+            }
+            rows.push(<div className="board-row">{rowSquares}</div>);
+        }
+
+        return (<div>{rows}</div>);
     }
 }
 
 class Game extends React.Component {
     constructor(props) {
         super(props);
+        this.boardSize = 3;
         this.state = {
             history: [{
                 squares: Array(9).fill(null),
@@ -88,11 +81,14 @@ class Game extends React.Component {
             return;
         }
         squares[i] = this.state.xIsNext ? 'X' : 'O';
+
+        const col = (i % this.boardSize) + 1;
+        const row = Math.trunc(i / this.boardSize) + 1;
         this.setState({
             // push()だと元の配列を変更してしまうため、concat()を使う。
             history: history.concat([{
                 squares: squares,
-                hand: [(i % 3) + 1, Math.trunc(i / 3) + 1], // [col, row]
+                hand: [col, row],
             }]),
             stepNumber: history.length,
             xIsNext: !this.state.xIsNext,
@@ -134,6 +130,7 @@ class Game extends React.Component {
                 <div className="game-board">
                     <Board
                         squares={current.squares}
+                        boardSize={this.boardSize}
                         onClick={(i) => this.handleClick(i)}
                     />
                 </div>
